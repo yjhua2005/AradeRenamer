@@ -1,0 +1,29 @@
+# 行尾统一：仓库里存 LF，Windows 检出时转 CRLF（.rc/.sln/.reg 必须是 CRLF，
+# rc.exe 和注册表编辑器对 LF 很敏感）。
+* text=auto eol=crlf
+
+# 源码统一 UTF-8，别让 Git 当成二进制或误判编码
+*.cpp   text  working-tree-encoding=UTF-8
+*.h     text  working-tree-encoding=UTF-8
+*.inc   text  working-tree-encoding=UTF-8
+*.rc    text  working-tree-encoding=UTF-8
+*.ini   text  working-tree-encoding=UTF-8
+*.md    text  working-tree-encoding=UTF-8
+*.html  text  working-tree-encoding=UTF-8
+*.py    text  working-tree-encoding=UTF-8
+*.sh    text eol=lf
+*.reg   text eol=crlf
+
+# 二进制：别做换行/编码转换，也别在 diff 里当文本展开
+*.jpg   binary
+*.jpeg  binary
+*.png   binary
+*.ico   binary
+*.exe   binary
+*.dll   binary
+*.txt   text
+
+# 这个 2003 年的遗留文件是 GBK 编码（conv.cpp 会先按 UTF-8 试、失败再按 GBK 解），
+# 必须原样入库，不能被编码转换或换行转换改坏。
+# 注意：必须写在 *.txt 之后——Git 用最后一条匹配的规则。
+Add-ons/gbkfix.txt -text

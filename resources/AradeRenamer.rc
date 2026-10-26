@@ -1,0 +1,786 @@
+#pragma code_page(65001)
+
+LANGUAGE 0, 0
+
+; ---- Self-contained style constants (avoids depending on SDK headers in rc) ----
+#define WS_CHILD          0x40000000L
+#define WS_VISIBLE        0x10000000L
+#define WS_TABSTOP        0x00010000L
+#define WS_BORDER         0x00800000L
+#define WS_CAPTION        0x00C00000L
+#define WS_SYSMENU        0x00080000L
+#define WS_THICKFRAME     0x00040000L
+#define WS_MINIMIZEBOX    0x00020000L
+#define WS_MAXIMIZEBOX    0x00010000L
+#define WS_CLIPCHILDREN   0x02000000L
+#define WS_GROUP          0x00020000L
+#define DS_SETFONT        0x00000040L
+#define DS_MODALFRAME     0x00000020L
+#define ES_AUTOHSCROLL    0x00000080L
+#define ES_MULTILINE      0x00000004L
+#define ES_AUTOVSCROLL    0x00000040L
+#define ES_READONLY       0x00000800L
+#define WS_VSCROLL        0x00200000L
+#define WS_POPUP          0x80000000L
+#define SS_LEFT           0x00000000L
+#define SS_NOTIFY         0x00000100L
+; 加速器表里要挂 F1 (用户手册)。rc 不引 SDK 头, 自己定义; 注释必须单独一行,
+; 跟在 #define 后面的 ; 会被当成宏值的一部分。
+#define VK_F1             0x70
+
+; ---- Control / dialog IDs (mirrored from resource.h; rc can't read #pragma once) ----
+#define IDR_MAINDLG        100
+#define IDR_MAINMENU       101
+#define IDC_TAB            1200
+#define IDC_LIST           1201
+#define IDC_STATUS         1002
+#define IDC_PROGRESS       1203
+#define IDC_OV_GRP_NAME    2009
+#define IDC_OV_GRP_EXT     2010
+#define IDC_RP_GRP         2106
+#define IDC_NM_GRP         2206
+#define IDC_AD_GRP         2309
+#define IDC_DL_GRP         2409
+#define IDC_EX_GRP         2509
+#define IDC_OV_LB_NAME     2011
+#define IDC_OV_LB_EXT      2012
+#define IDC_OV_LB_FILTER   2013
+#define IDC_RP_LB_FIND     2107
+#define IDC_RP_LB_REPL     2108
+#define IDC_NM_LB_TPL      2207
+#define IDC_NM_LB_START    2208
+#define IDC_NM_LB_STEP     2209
+#define IDC_AD_LB_TEXT     2310
+#define IDC_AD_LB_POS      2311
+#define IDC_DL_LB_TEXT     2410
+#define IDC_DL_LB_NUM      2411
+#define IDC_EX_LB_TEXT     2510
+#define IDC_TB_ADD         1101
+#define IDC_TB_ADDF        1102
+#define IDC_TB_DEL         1103
+#define IDC_TB_APPLY       1104
+#define IDC_TB_UNDO        1105
+#define IDC_TB_CLEAR       1106
+#define IDC_TB_PREVIEW     1107
+#define IDC_TB_PIN         1108   // 窗口置顶
+#define IDC_TB_TAGDEL      1109
+#define IDC_TB_TAGEXTRACT  1110
+#define IDC_TB_TAGWRITE    1111
+#define IDC_TB_T2S         1112
+#define IDC_TB_TEXTCMD     1113
+#define IDC_TB_EXPLIST     1114
+#define IDC_TB_RECOPEN     1115
+#define IDC_TB_RECSAVE     1116
+#define IDC_TB_RECCLEAR    1117
+#define IDC_TB_CHGDATE     1118
+#define IDC_TB_REC_PANEL   1119
+#define IDC_TB_SPONSOR     1120
+#define IDR_MAINACC        103
+#define IDC_SET_TAB        2700
+#define IDC_SET_TAGBAK     2701
+#define IDC_SET_IGNFOLDER  2711
+#define IDC_SET_WALKALL    2712
+#define IDC_SET_NODATE     2713
+#define IDC_SET_AUTOPREV   2714
+#define IDC_SET_SORTINIT   2715
+#define IDC_SET_FASTPREV   2716
+#define IDC_SET_AUTOCORR   2717
+#define IDC_SET_CONFIRMEXIT 2718
+#define IDC_SET_LB_WORD    2719
+#define IDC_SET_WORDCHARS  2720
+#define IDC_SET_ID3V2FIRST 2721
+#define IDC_SET_LB_ID3NOTE 2722
+#define IDC_SET_LB_REMOVEM 2723
+#define IDC_SET_REMOVEMODE 2724
+#define IDC_SET_LB_WRITEM  2725
+#define IDC_SET_WRITEMODE  2726
+#define IDC_SET_TAGPROMPT  2727
+#define IDC_SET_KEEPDATE   2728
+#define IDC_SET_TRACKPAD   2729
+#define IDC_SET_KEEPBLANK  2730
+#define IDC_SET_EXP_EXT    2731
+#define IDC_SET_EXP_PATH   2732
+#define IDC_SET_EXP_NOFOLDER 2733
+#define IDC_SET_USEMETA    2734
+#define IDC_SET_METALIST   2735
+#define IDC_SET_ENHLIST    2736
+#define IDC_SET_GRID       2737
+#define IDC_SET_BIGTB      2738
+#define IDC_SET_LB_COLOR   2739
+#define IDC_SET_COLOR      2740
+#define IDC_SET_RESTORE    2741
+#define IDD_CHGDATE        2800
+#define IDC_DT_NOW         2801
+#define IDC_DT_CUSTOM      2802
+#define IDC_DT_GRP_CREATE  2803
+#define IDC_DT_GRP_ACCESS  2804
+#define IDC_DT_GRP_WRITE   2805
+#define IDC_DT_CREATE_D    2806
+#define IDC_DT_CREATE_T    2807
+#define IDC_DT_ACCESS_D    2808
+#define IDC_DT_ACCESS_T    2809
+#define IDC_DT_WRITE_D     2810
+#define IDC_DT_WRITE_T     2811
+#define IDD_ABOUT          2900
+#define IDD_LICENSE        2901
+#define IDC_ABOUT_TEXT     2902
+#define IDC_ABOUT_LICENSE  2903
+#define IDC_LIC_TEXT       2904
+#define IDC_ABOUT_ICON     2905
+#define IDC_ABOUT_TITLE    2906
+#define IDC_ABOUT_SPONSOR  2929
+#define IDD_SPONSOR        2930
+#define IDC_SP_QR_WX       2919
+#define IDC_SP_QR_ALI      2920
+#define IDC_SP_QR_PP       2921
+#define IDC_SP_GITHUB      2922
+#define IDC_SP_QQ          2923
+#define IDC_SP_EMAIL       2924
+#define IDC_SP_AUTHOR      2925
+#define IDC_SP_LIC         2926
+#define IDC_SP_COPY_QQ     2927
+#define IDC_SP_DISCLAIMER  2928
+#define IDC_SP_DISC_TEXT   2931
+#define IDR_SPONSOR_WECHAT 2940
+#define IDR_SPONSOR_ALIPAY 2941
+#define IDR_SPONSOR_PAYPAL 2942
+#define IDR_LIC_OPENCC     2910
+#define IDR_LIC_PINYIN     2911
+#define IDR_DICT_T2S       2912
+#define IDR_DICT_S2T       2913
+#define IDR_PINYIN         2914
+#define IDR_DICT_T2S_PHRASES 2915
+#define IDR_DICT_S2T_PHRASES 2916
+#define IDR_LANG_ZH_CN     2917
+#define IDR_LANG_EN_US     2918
+#define IDI_IC_APP         300   // 程序图标
+#define IDI_IC_ADD         301   // 添加文件
+#define IDI_IC_ADDF        302   // 添加目录 (folder)
+#define IDI_IC_DEL         303   // 移除选中项
+#define IDI_IC_CLEAR       304   // 清空列表
+#define IDI_IC_PREVIEW     305   // 预览
+#define IDI_IC_APPLY       306   // 开始更名
+#define IDI_IC_UNDO        307   // 撤销上一次更名
+#define IDI_IC_PIN         308   // 窗口置顶
+#define IDI_IC_TAGDEL      309   // 移除音乐文件标签
+#define IDI_IC_TAGEXT      310   // 提取音乐文件标签命名
+#define IDI_IC_TAGWRITE    311   // 写入音乐文件标签
+#define IDI_IC_T2S         312   // 文件名繁体转简体
+#define IDI_IC_TEXTCMD     313   // 调用文本文件命令
+#define IDI_IC_EXPLIST     314   // 导出当前文件列表
+#define IDI_IC_RECOPEN     315   // 打开操作记录
+#define IDI_IC_RECSAVE     316   // 保存操作记录
+#define IDI_IC_RECCLEAR    317   // 清除操作记录
+#define IDI_IC_CHGDATE     318   // 更改文件日期
+#define IDI_IC_RECPANEL    319   // 显示操作记录面板
+#define IDI_IC_SPONSOR     320   // 赞助 / 联系 (爱心)
+#define IDC_OV_NAME_UPPER  2001
+#define IDC_OV_NAME_LOWER  2002
+#define IDC_OV_NAME_TITLE  2003
+#define IDC_OV_NAME_TEXT   2004
+#define IDC_OV_EXT_UPPER   2005
+#define IDC_OV_EXT_LOWER   2006
+#define IDC_OV_EXT_TEXT    2007
+#define IDC_OV_FILTER      2008
+#define IDC_RP_ENABLE      2101
+#define IDC_RP_FIND        2102
+#define IDC_RP_REPL        2103
+#define IDC_RP_REGEX       2104
+#define IDC_RP_CASEI       2105
+#define IDC_NM_ENABLE      2201
+#define IDC_NM_TPL         2202
+#define IDC_NM_START       2203
+#define IDC_NM_STEP        2204
+#define IDC_NM_LETTER      2205
+#define IDC_NM_LB_PRESET   2210
+#define IDC_NM_PRESET      2211
+#define IDC_NM_LB_WIDTH    2212
+#define IDC_NM_WIDTH       2213
+#define IDC_NM_PAD         2214
+#define IDC_NM_UPPER       2215
+#define IDC_NM_START_SPIN  2216
+#define IDC_NM_STEP_SPIN   2217
+#define IDC_NM_WIDTH_SPIN  2218
+#define IDC_AD_ENABLE      2301
+#define IDC_AD_TEXT        2302
+#define IDC_AD_PRE         2303
+#define IDC_AD_SUF         2304
+#define IDC_AD_EXTPRE      2305
+#define IDC_AD_EXTSUF      2306
+#define IDC_AD_AT          2307
+#define IDC_AD_POS         2308
+#define IDC_DL_ENABLE      2401
+#define IDC_DL_TEXT        2402
+#define IDC_DL_HEAD        2403
+#define IDC_DL_TAIL        2404
+#define IDC_DL_CONTENT     2405
+#define IDC_DL_NUM         2406
+#define IDC_DL_NAME        2407
+#define IDC_DL_EXT         2408
+#define IDC_EX_ENABLE      2501
+#define IDC_EX_ADD         2502
+#define IDC_EX_DEL         2503
+#define IDC_EX_CHG         2504
+#define IDC_EX_CASE        2505
+#define IDC_EX_TEXT        2506
+#define IDC_EX_UP          2507
+#define IDC_EX_LO          2508
+#define IDC_EX_CMD         2511
+#define IDC_EX_PRESET      2512
+#define IDC_EX_LB_CMD      2513
+#define IDC_EX_LB_PRESET   2514
+#define IDC_TG_ENABLE      2603
+#define IDC_TG_LB_EXPR     2604
+#define IDC_TG_EXPR        2605
+#define IDC_TG_LB_PRE      2606
+#define IDC_TG_PRESET      2607
+#define IDC_TG_B1          2608
+#define IDC_TG_B2          2609
+#define IDC_TG_B3          2610
+#define IDC_TG_B4          2611
+#define IDC_TG_B5          2612
+#define IDC_TG_B6          2613
+#define IDC_TG_LB_PREV     2614
+#define IDC_TG_PREVIEW     2615
+#define IDC_TW_ENABLE      2620
+#define IDC_TW_LB_EXPR     2621
+#define IDC_TW_EXPR        2622
+#define IDC_TW_LB_PRE      2623
+#define IDC_TW_PRESET      2624
+#define IDC_TW_CLEAR       2625
+#define IDC_TW_SAVE        2626
+#define IDC_TW_WRITE       2627
+#define IDC_TW_LB_ARTIST   2630
+#define IDC_TW_ARTIST      2631
+#define IDC_TW_LB_TITLE    2632
+#define IDC_TW_TITLE       2633
+#define IDC_TW_LB_ALBUM    2634
+#define IDC_TW_ALBUM       2635
+#define IDC_TW_LB_TRACK    2636
+#define IDC_TW_TRACK       2637
+#define IDC_TW_LB_YEAR     2638
+#define IDC_TW_YEAR        2639
+#define IDC_TW_LB_GENRE    2640
+#define IDC_TW_GENRE       2641
+#define IDC_TW_LB_COMMENT  2642
+#define IDC_TW_COMMENT     2643
+#define IDD_SETTINGS       102
+
+// ----------------------------- Menu -----------------------------
+// 条目、顺序、分割线、快捷键全部按 指令.txt 的第一段。文档里的"保持操作记录(S)"按工具栏
+// 同名条目写成"保存操作记录"; "ID3v2复制到ID3v1(3)"的助记符取 (V)。
+IDR_MAINMENU MENU
+BEGIN
+  POPUP "文件(&F)"
+  BEGIN
+    MENUITEM "添加文件(&A)\tCtrl+Shift+A",  4001
+    MENUITEM "导出当前列表(&E)\tCtrl+Shift+L", 4004
+    MENUITEM "退出(&X)\tAlt+F4",            4003
+  END
+  POPUP "更名(&P)"
+  BEGIN
+    MENUITEM "预览(&P)\tCtrl+F",            4011
+    MENUITEM "应用(&A)\tCtrl+E",            4012
+    MENUITEM SEPARATOR
+    MENUITEM "撤销(&U)\tCtrl+Z",            4013
+    MENUITEM SEPARATOR
+    MENUITEM "打开操作记录(&O)\tCtrl+O",     4100
+    MENUITEM "保存操作记录(&S)\tCtrl+S",     4101
+    MENUITEM "清除操作记录(&C)\tCtrl+Shift+R", 4102
+    MENUITEM SEPARATOR
+    MENUITEM "调用文本文件命名(&T)\tCtrl+Shift+T", 4103
+    MENUITEM "提取音乐文件标签命名(&I)\tCtrl+D", 4104
+    MENUITEM SEPARATOR
+    MENUITEM "文件名繁体转简体(&G)\tCtrl+Alt+S", 4105
+    MENUITEM "文件名简体转繁体(&X)\tCtrl+Alt+T", 4106
+    MENUITEM "文件名 BIG5 -> GB(&5)\tCtrl+G",    4107
+    MENUITEM "文件名 GB -> BIG5(&W)\tCtrl+Alt+B", 4108
+    MENUITEM "文件名日文Shift-JIS转中文(&J)\tCtrl+Alt+G",  4109
+    MENUITEM "文件名中文转日文Shift-JIS(&B)\tCtrl+Alt+J",  4110
+    MENUITEM SEPARATOR
+    MENUITEM "以文件的 CRC32 更名(&R)\tCtrl+Alt+C",        4111
+    MENUITEM "以网页文件的标题更名(&Y)\tCtrl+T",            4112
+    MENUITEM "以文本文件的第一行内容更名(&Z)\tCtrl+L",       4113
+  END
+  POPUP "标签(&T)"
+  BEGIN
+    MENUITEM "移除音乐文件标签(&M)\tCtrl+R",  4120
+    MENUITEM "写入音乐文件标签(&W)\tCtrl+W",  4121
+    MENUITEM SEPARATOR
+    MENUITEM "导出音乐文件标签(&R)\tCtrl+Shift+E", 4122
+    MENUITEM "利用文本文件写入标签(&B)\tCtrl+Shift+I", 4123
+    MENUITEM SEPARATOR
+    MENUITEM "MP3文件的ID3v1复制到ID3v2(&P)", 4124
+    MENUITEM "MP3文件的ID3v2复制到ID3v1(&V)", 4125
+    MENUITEM SEPARATOR
+    MENUITEM "音乐文件标签 BIG5 -> GB(&E)",   4126
+    MENUITEM "音乐文件标签 GB -> BIG5(&F)",   4127
+    MENUITEM "音乐文件标签繁体转简体(&Y)",      4128
+    MENUITEM "音乐文件标签简体转繁体(&Z)",      4129
+    MENUITEM "音乐文件标签日文Shift-JIS转中文(&S)", 4130
+    MENUITEM "音乐文件标签中文转日文Shift-JIS(&H)", 4131
+  END
+  POPUP "选项(&O)"
+  BEGIN
+    MENUITEM "设置(&O)\tCtrl+Shift+O",        4022
+    MENUITEM "窗口居中显示(&Y)",              4140
+    POPUP "语言(&L)"
+    BEGIN
+      MENUITEM "（无）",                      4141, GRAYED
+    END
+    MENUITEM SEPARATOR
+    // 这两项写的是 HKEY_CLASSES_ROOT(对所有用户生效), 需要管理员权限 ——
+    // 名字里带上「管理员」, 免得用户以为点了没动静。助记符: 卸载 Z / 添加 A。
+    MENUITEM "卸载右键菜单(管理员)(&Z)",      4142
+    MENUITEM "添加右键菜单(管理员)(&A)",      4143
+    MENUITEM SEPARATOR
+    MENUITEM "从 发送到 菜单移除(&V)",          4146
+    MENUITEM "添加到 发送到 菜单(&S)",          4145
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "用户手册(&H)\tF1",              4144
+    MENUITEM SEPARATOR
+    MENUITEM "关于...(&A)",                   4099
+  END
+END
+
+// ----------------------------- Accelerators -----------------------------
+// 后半段是后来补的、菜单里原本没标快捷键的那几条 (见菜单里的 \tCtrl+Shift+X)。
+// 一律用 Ctrl+Shift+<字母>: Ctrl+<字母> 那一批已经排满了, 而且 Ctrl+A / Ctrl+Z
+// 在输入框里是编辑键, 加 Shift 就不跟它们抢 (消息循环里还有一道焦点保护)。
+// 文件列表的 Delete 键不在这里——它挂的是列表自己的 LVN_KEYDOWN, 这样焦点在
+// 输入框里时列表收不到通知, Delete 仍然是"删字符", 不会误删列表行。
+IDR_MAINACC ACCELERATORS
+BEGIN
+    "F",            4011, VIRTKEY, CONTROL
+    "E",            4012, VIRTKEY, CONTROL
+    "Z",            4013, VIRTKEY, CONTROL
+    "O",            4100, VIRTKEY, CONTROL
+    "S",            4101, VIRTKEY, CONTROL
+    "D",            4104, VIRTKEY, CONTROL
+    "G",            4107, VIRTKEY, CONTROL
+    "T",            4112, VIRTKEY, CONTROL
+    "L",            4113, VIRTKEY, CONTROL
+    "R",            4120, VIRTKEY, CONTROL
+    "W",            4121, VIRTKEY, CONTROL
+    "S",            4105, VIRTKEY, CONTROL, ALT
+    "T",            4106, VIRTKEY, CONTROL, ALT
+    "B",            4108, VIRTKEY, CONTROL, ALT
+    "G",            4109, VIRTKEY, CONTROL, ALT
+    "J",            4110, VIRTKEY, CONTROL, ALT
+    "C",            4111, VIRTKEY, CONTROL, ALT
+    "A",            4205, VIRTKEY, CONTROL
+    VK_F1,          4144, VIRTKEY
+    "A",            4001, VIRTKEY, CONTROL, SHIFT
+    "L",            4004, VIRTKEY, CONTROL, SHIFT
+    "R",            4102, VIRTKEY, CONTROL, SHIFT
+    "T",            4103, VIRTKEY, CONTROL, SHIFT
+    "E",            4122, VIRTKEY, CONTROL, SHIFT
+    "I",            4123, VIRTKEY, CONTROL, SHIFT
+    "O",            4022, VIRTKEY, CONTROL, SHIFT
+END
+
+// ----------------------------- Dialog ---------------------------
+// NOTE: control positions below are placeholders. Every control is re-placed
+// in pixels (DPI-scaled) by Layout() in main.cpp, so the dialog looks the same
+// on any font/DPI setting. Only the control set, IDs and styles are authoritative here.
+//
+// Styles are literal hex and all carry WS_CLIPSIBLINGS (0x04000000).
+// Template order IS the sibling z-order, verified against the live dialog with
+// GetWindow(GW_CHILD)/GW_HWNDNEXT: the control listed FIRST is TOPMOST. So every
+// container (each group box, the SysTabControl32) is listed AFTER the controls it
+// holds; otherwise the container paints its background over them and, because they
+// are clipped siblings, they never repaint and look invisible.
+IDR_MAINDLG DIALOGEX 0, 0, 700, 160
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_CLIPCHILDREN
+CAPTION "Arade文件更名器"
+MENU IDR_MAINMENU
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  // ---- Toolbar (owner-draw icon buttons; order/spacing/separators set in Layout()) ----
+  // 类命令, 这两项将移到列表右键菜单里。
+  CONTROL         "", 1101, "Button", 0x5401000B, 2,  1,  24, 24   // 添加文件
+  CONTROL         "", 1102, "Button", 0x5401000B, 9,  1,  24, 24   // 添加目录
+  CONTROL         "", 1107, "Button", 0x5401000B, 31, 1,  24, 24   // 预览
+  CONTROL         "", 1105, "Button", 0x5401000B, 46, 1,  24, 24   // 撤销
+  CONTROL         "", 1104, "Button", 0x5401000B, 38, 1,  24, 24   // 应用
+  CONTROL         "", 1109, "Button", 0x5401000B, 54, 1,  24, 24   // 移除音乐文件标签
+  CONTROL         "", 1110, "Button", 0x5401000B, 61, 1,  24, 24   // 提取音乐文件标签命名
+  CONTROL         "", 1111, "Button", 0x5401000B, 68, 1,  24, 24   // 写入音乐文件标签
+  CONTROL         "", 1112, "Button", 0x5401000B, 75, 1,  24, 24   // 文件名繁体转简体
+  CONTROL         "", 1113, "Button", 0x5401000B, 82, 1,  24, 24   // 调用文本文件命令
+  CONTROL         "", 1114, "Button", 0x5401000B, 89, 1,  24, 24   // 导出当前文件列表
+  CONTROL         "", 1115, "Button", 0x5401000B, 96, 1,  24, 24   // 打开操作记录
+  CONTROL         "", 1116, "Button", 0x5401000B, 103, 1, 24, 24   // 保存操作记录
+  CONTROL         "", 1117, "Button", 0x5401000B, 110, 1, 24, 24   // 清除操作记录
+  CONTROL         "", 1118, "Button", 0x5401000B, 117, 1, 24, 24   // 更改文件日期
+  CONTROL         "", 1119, "Button", 0x5401000B, 124, 1, 24, 24   // 显示操作记录面板
+  CONTROL         "", 1108, "Button", 0x5401000B, 131, 1, 24, 24   // 窗口置顶
+  CONTROL         "", 1120, "Button", 0x5401000B, 138, 1, 24, 24   // 赞助 / 联系 (Layout 里钉在最右边)
+
+  // =================== Tab 0: 整体 ===================
+  CONTROL         "文件名改成大写", 2001, "Button", 0x54020009, 5,  16, 100, 14
+  CONTROL         "文件名改成小写", 2002, "Button", 0x54010009, 20, 16, 100, 14
+  CONTROL         "文件名中单词第一个字母大写", 2003, "Button", 0x54010009, 34, 16, 170, 14
+  LTEXT           "文件名改成", 2011, 62, 17, 60, 14
+  EDITTEXT        2004, 78, 16, 150, 16, 0x54810080
+  CONTROL         "扩展名改成大写", 2005, "Button", 0x54020009, 5,  52, 100, 14
+  CONTROL         "扩展名改成小写", 2006, "Button", 0x54010009, 20, 52, 100, 14
+  LTEXT           "扩展名改成", 2012, 34, 53, 60, 14
+  EDITTEXT        2007, 50, 52, 120, 16, 0x54810080
+  LTEXT           "文件过滤", 2013, 62, 53, 50, 14
+  CONTROL         "", 2008, "ComboBox", 0x54110002, 78, 52, 144, 120   // CBS_DROPDOWN: 预设可挑, 也能手工输入
+  CONTROL         "文件名", 2009, "Button", 0x54000007, 3,  11, 688, 34
+  CONTROL         "扩展名", 2010, "Button", 0x54000007, 3,  47, 688, 34
+
+  // =================== Tab 1: 替换 ===================
+  CONTROL         "启用替换", 2101, "Button", 0x54020003, 5,  16, 70, 14
+  LTEXT           "查找", 2107, 15, 17, 30, 14
+  EDITTEXT        2102, 22, 16, 150, 16, 0x54810080
+  LTEXT           "替换为", 2108, 42, 17, 40, 14
+  EDITTEXT        2103, 53, 16, 150, 16, 0x54810080
+  CONTROL         "正则表达式(查找以 : 开头)", 2104, "Button", 0x54010003, 79, 16, 150, 14
+  CONTROL         "忽略大小写", 2105, "Button", 0x54010003, 104, 16, 80, 14
+  CONTROL         "替换", 2106, "Button", 0x54000007, 3, 11, 688, 34
+
+  // =================== Tab 2: 序号 ===================
+  CONTROL         "启用序号", 2201, "Button", 0x54020003, 5,  16, 70, 14
+  LTEXT           "模板( # 为序号, <NAME> 原名 )", 2207, 15, 17, 140, 14
+  EDITTEXT        2202, 35, 16, 220, 16, 0x54810080
+  LTEXT           "预设", 2210, 60, 17, 26, 14
+  CONTROL         "", 2211, "ComboBox", 0x54110003, 64, 16, 120, 120   // CBS_DROPDOWNLIST: 只挑不输入
+  LTEXT           "起始", 2208, 67, 17, 30, 14
+  EDITTEXT        2203, 73, 16, 50, 16, 0x54810080
+  LTEXT           "步长", 2209, 81, 17, 30, 14
+  EDITTEXT        2204, 87, 16, 50, 16, 0x54810080
+  LTEXT           "位数", 2212, 93, 17, 30, 14
+  EDITTEXT        2213, 99, 16, 50, 16, 0x54810080
+  CONTROL         "不足位补齐", 2214, "Button", 0x54020003, 105, 17, 70, 14
+  CONTROL         "使用字母编号(0=A)", 2205, "Button", 0x54010003, 95, 16, 140, 14
+  CONTROL         "字母大写", 2215, "Button", 0x54020003, 112, 17, 60, 14
+  CONTROL         "序号", 2206, "Button", 0x54000007, 3, 11, 688, 34
+
+  // =================== Tab 3: 添加 ===================
+  CONTROL         "启用添加", 2301, "Button", 0x54020003, 5,  16, 70, 14
+  LTEXT           "添加内容", 2310, 15, 17, 50, 14
+  EDITTEXT        2302, 23, 16, 200, 16, 0x54810080
+  CONTROL         "文件名前", 2303, "Button", 0x54020009, 5,  46, 70, 14
+  CONTROL         "文件名后", 2304, "Button", 0x54010009, 23, 46, 70, 14
+  CONTROL         "扩展名前", 2305, "Button", 0x54010009, 42, 46, 70, 14
+  CONTROL         "扩展名后", 2306, "Button", 0x54010009, 61, 46, 70, 14
+  CONTROL         "指定位置", 2307, "Button", 0x54010009, 80, 46, 70, 14
+  LTEXT           "位置", 2311, 100, 47, 30, 14
+  EDITTEXT        2308, 108, 46, 50, 16, 0x54810080
+  CONTROL         "添加", 2309, "Button", 0x54000007, 3, 11, 688, 72
+
+  // =================== Tab 4: 删除 ===================
+  CONTROL         "启用删除", 2401, "Button", 0x54020003, 5,  16, 70, 14
+  CONTROL         "删除指定文本", 2402, "Button", 0x54020009, 24, 16, 90, 14
+  CONTROL         "删除前 N 个", 2403, "Button", 0x54010009, 47, 16, 80, 14
+  CONTROL         "删除后 N 个", 2404, "Button", 0x54010009, 67, 16, 80, 14
+  CONTROL         "从第 N 个起删 M 个", 2413, "Button", 0x54010009, 87, 16, 130, 14
+  LTEXT           "文本", 2410, 5,  47, 30, 14
+  EDITTEXT        2405, 13, 46, 160, 16, 0x54810080
+  LTEXT           "起始", 2416, 54, 47, 30, 14
+  EDITTEXT        2414, 60, 46, 50, 16, 0x54810080
+  LTEXT           "数量", 2411, 54, 47, 30, 14
+  EDITTEXT        2406, 64, 46, 50, 16, 0x54810080
+  CONTROL         "作用: 文件名", 2407, "Button", 0x54020009, 80, 46, 80, 14
+  CONTROL         "作用: 扩展名", 2408, "Button", 0x54010009, 100, 46, 80, 14
+  CONTROL         "删除", 2409, "Button", 0x54000007, 3, 11, 688, 72
+
+  // =================== Tab 5: 扩展更名 ===================
+  CONTROL         "启用扩展更名", 2501, "Button", 0x54020003, 5,  16, 90, 14
+  CONTROL         "添加扩展名", 2502, "Button", 0x54020009, 29, 16, 80, 14
+  CONTROL         "删除扩展名", 2503, "Button", 0x54010009, 49, 16, 80, 14
+  CONTROL         "更改扩展名", 2504, "Button", 0x54010009, 69, 16, 80, 14
+  CONTROL         "扩展名大小写", 2505, "Button", 0x54010009, 89, 16, 90, 14
+  LTEXT           "扩展名", 2510, 5,  47, 40, 14
+  EDITTEXT        2506, 15, 46, 160, 16, 0x54810080
+  CONTROL         "大写", 2507, "Button", 0x54020009, 58, 46, 50, 14
+  CONTROL         "小写", 2508, "Button", 0x54010009, 71, 46, 50, 14
+  LTEXT           "扩展命令", 2513, 30, 47, 48, 14
+  EDITTEXT        2511, 38, 46, 150, 16, 0x54810080
+  LTEXT           "预设方案", 2514, 60, 17, 48, 14
+  // WS_VSCROLL (0x00200000) is what makes the 9 presets reachable; 0x0101 = LBS_NOTIFY |
+  // LBS_NOINTEGRALHEIGHT, and no LBS_SORT so the list keeps the order below.
+  LISTBOX         2512, 76, 11, 100, 60, 0x54A10101
+  CONTROL         "扩展更名", 2509, "Button", 0x54000007, 3, 11, 688, 72
+
+  // =================== Tab 6: 标签命名 ===================
+  // No group box on this page: the reference draws these two tabs straight onto the
+  // tab page frame. 标签写入 needs three rows, so it uses a tighter row pitch.
+  CONTROL         "启用标签命名", 2603, "Button", 0x54020003, 5,  16, 90, 14
+  LTEXT           "标签表达式", 2604, 5, 17, 62, 14
+  EDITTEXT        2605, 15, 16, 200, 16, 0x54810080
+  LTEXT           "预设", 2606, 60, 17, 34, 14
+  CONTROL         "", 2607, "ComboBox", 0x54110003, 66, 16, 120, 120   // CBS_DROPDOWNLIST
+  PUSHBUTTON      "%1 - 艺术家", 2608, 5, 32, 90, 18
+  PUSHBUTTON      "%2 - 标题", 2609, 25, 32, 90, 18
+  PUSHBUTTON      "%3 - 音轨", 2610, 45, 32, 90, 18
+  PUSHBUTTON      "%4 - 专辑", 2611, 65, 32, 90, 18
+  PUSHBUTTON      "%5 - 年代", 2612, 85, 32, 90, 18
+  PUSHBUTTON      "%6 - 注释", 2613, 105, 32, 90, 18
+  LTEXT           "预览", 2614, 125, 33, 34, 14
+  LTEXT           "", 2615, 140, 33, 300, 14
+  // 标签表达式 and 预览 are blue in the reference; the colour is set in WM_CTLCOLORSTATIC.
+
+  // =================== Tab 7: 标签写入 ===================
+  CONTROL         "启用标签写入", 2620, "Button", 0x54020003, 5,  10, 90, 14
+  LTEXT           "文件名表达式", 2621, 5, 22, 74, 14
+  EDITTEXT        2622, 20, 21, 220, 16, 0x54810080
+  LTEXT           "预设", 2623, 60, 22, 34, 14
+  CONTROL         "", 2624, "ComboBox", 0x54110003, 66, 21, 120, 120   // CBS_DROPDOWNLIST
+  PUSHBUTTON      "清空", 2625, 100, 21, 50, 16
+  LTEXT           "艺术家", 2630, 5, 33, 44, 14
+  EDITTEXT        2631, 15, 32, 140, 16, 0x54810080
+  LTEXT           "标题", 2632, 40, 33, 34, 14
+  EDITTEXT        2633, 50, 32, 140, 16, 0x54810080
+  LTEXT           "专辑", 2634, 75, 33, 34, 14
+  EDITTEXT        2635, 85, 32, 140, 16, 0x54810080
+  PUSHBUTTON      "保存", 2626, 100, 32, 50, 16
+  LTEXT           "音轨", 2636, 5, 44, 34, 14
+  EDITTEXT        2637, 12, 43, 44, 16, 0x54810080
+  LTEXT           "年代", 2638, 25, 44, 34, 14
+  EDITTEXT        2639, 32, 43, 52, 16, 0x54810080
+  LTEXT           "流派", 2640, 45, 44, 34, 14
+  CONTROL         "", 2641, "ComboBox", 0x54110002, 52, 43, 120, 120   // CBS_DROPDOWN: 可挑可输
+  LTEXT           "注释", 2642, 70, 44, 34, 14
+  EDITTEXT        2643, 80, 43, 164, 16, 0x54810080
+  PUSHBUTTON      "全写", 2627, 100, 43, 50, 16
+
+  // ---- Tab control: behind every tab-page control, so it must come last ----
+  CONTROL         "", 1200, "SysTabControl32", 0x54010000, 2, 7, 690, 90
+
+  // ---- ListView (columns added in code) ----
+  // 0x...0001 = LVS_REPORT only. Bit 0x400 here would be LVS_OWNERDRAWFIXED, which
+  // makes the control expect WM_DRAWITEM per row and leaves every row blank.
+  CONTROL         "", 1201, "SysListView32", 0x54810001, 2, 99, 690, 55
+END
+
+// ----------------------------- Settings dialog -----------------------------
+// The template geometry below is a placeholder: like the main dialog, SettingsProc
+// re-sizes and re-places every control in DPI-scaled pixels (the DLU grid depends on
+// the mapped font, which made the controls land outside the client area).
+// Geometry below is a placeholder grid (roughly 1 DLU = 2 base pixels). SettingsProc
+// re-creates the size and re-places every control in DPI-scaled pixels, so only the
+// control set, the IDs and the styles are load-bearing here.
+IDD_SETTINGS DIALOGEX 0, 0, 180, 115
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "设置"
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  // =================== Page 0: 一般参数 ===================
+  CONTROL         "忽略文件夹", 2711, "Button", 0x54020003, 8, 17, 75, 8
+  CONTROL         "文件列表在初始化时排序", 2715, "Button", 0x54020003, 90, 17, 82, 8
+  CONTROL         "遍历文件夹下的所有文件", 2712, "Button", 0x54020003, 8, 28, 80, 8
+  CONTROL         "快速自动预览（只预览前十项）", 2716, "Button", 0x54020003, 90, 28, 84, 8
+  CONTROL         "不获取文件的日期", 2713, "Button", 0x54020003, 8, 39, 75, 8
+  CONTROL         "自动更正错误", 2717, "Button", 0x54020003, 90, 39, 75, 8
+  CONTROL         "文件更名自动预览", 2714, "Button", 0x54020003, 8, 50, 75, 8
+  CONTROL         "退出时确认", 2718, "Button", 0x54020003, 90, 50, 75, 8
+  LTEXT           "文件名单词判断字符", 2719, 8, 66, 55, 7
+  CONTROL         "", 2720, "ComboBox", 0x54110003, 75, 64, 60, 60   // CBS_DROPDOWNLIST
+
+  // =================== Page 1: 音乐文件标签 ===================
+  CONTROL         "MP3 ID3v2 标签优先", 2721, "Button", 0x54020003, 8, 17, 75, 8
+  LTEXT           "* 默认为ID3v1优先", 2722, 100, 18, 70, 7
+  LTEXT           "移除ID3标签时", 2723, 8, 31, 45, 7
+  CONTROL         "", 2724, "ComboBox", 0x54110003, 55, 30, 70, 60
+  LTEXT           "ID3标签写入时", 2725, 8, 44, 45, 7
+  CONTROL         "", 2726, "ComboBox", 0x54110003, 55, 43, 70, 60
+  CONTROL         "标签写入时提示", 2727, "Button", 0x54020003, 8, 57, 70, 8
+  CONTROL         "保留文件日期", 2728, "Button", 0x54020003, 100, 57, 70, 8
+  CONTROL         "音轨数字低于两位自动补0", 2729, "Button", 0x54020003, 8, 68, 85, 8
+  CONTROL         "保留空白项的标签", 2730, "Button", 0x54020003, 8, 79, 70, 8
+  CONTROL         "写入前先备份原文件 (.bak)", 2701, "Button", 0x54020003, 100, 79, 82, 8
+
+  // =================== Page 2: 导出文件列表 ===================
+  CONTROL         "同时导出文件扩展名", 2731, "Button", 0x54020003, 8, 17, 80, 8
+  CONTROL         "同时导出文件路径", 2732, "Button", 0x54020003, 8, 28, 80, 8
+  CONTROL         "不包括文件夹", 2733, "Button", 0x54020003, 8, 39, 80, 8
+
+  // =================== Page 3: 元变量 ===================
+  CONTROL         "使用元变量", 2734, "Button", 0x54020003, 8, 16, 60, 8
+  CONTROL         "", 2735, "SysListView32", 0x54810001, 8, 27, 156, 62   // LVS_REPORT
+
+  // =================== Page 4: 界面 ===================
+  CONTROL         "文件列表使用增强界面", 2736, "Button", 0x54020003, 8, 17, 85, 8
+  CONTROL         "显示表格", 2737, "Button", 0x54020003, 8, 28, 70, 8
+  CONTROL         "工具栏使用大图标", 2738, "Button", 0x54020003, 8, 39, 80, 8
+  LTEXT           "文件列表颜色搭配", 2739, 8, 53, 55, 7
+  CONTROL         "", 2740, "ComboBox", 0x54110003, 75, 51, 60, 60
+
+  // ---- Tab control: behind every tab-page control, so it must come last ----
+  CONTROL         "", 2700, "SysTabControl32", 0x54010000, 4, 3, 172, 12
+
+  DEFPUSHBUTTON   "确定", 1, 10, 100, 33, 11
+  PUSHBUTTON      "取消", 2, 50, 100, 33, 11
+  PUSHBUTTON      "恢复默认", 2741, 132, 100, 41, 11
+END
+
+// ------------------------ 更改文件日期 ------------------------
+// 见 更改文件日期对话框.png：两个单选决定用当前时间还是三个自定义时间，右侧是
+// 确定/取消。和 设置 一样，这里的坐标只是占位，ChgDateProc 会按 DPI 重新摆放。
+// 2801 带 WS_GROUP，两个单选才互斥；DTS_TIMEFORMAT(0x9) 自带 DTS_UPDOWN 位，
+// 显示成那种带上下箭头的 23:46:29（再或一个 0x1 会多出勾选框）。
+IDD_CHGDATE DIALOGEX 0, 0, 272, 210
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "更改文件日期"
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  CONTROL         "使用当前的日期和时间", 2801, "Button", 0x54020009, 10, 8, 120, 10
+  CONTROL         "使用自定义日期和时间", 2802, "Button", 0x54010009, 10, 24, 120, 10
+  GROUPBOX        "创建日期", 2803, 10, 42, 252, 46
+  CONTROL         "", 2806, "SysDateTimePick32", 0x50010004, 16, 56, 120, 16
+  CONTROL         "", 2807, "SysDateTimePick32", 0x50010009, 160, 56, 96, 16
+  GROUPBOX        "访问日期", 2804, 10, 92, 252, 46
+  CONTROL         "", 2808, "SysDateTimePick32", 0x50010004, 16, 106, 120, 16
+  CONTROL         "", 2809, "SysDateTimePick32", 0x50010009, 160, 106, 96, 16
+  GROUPBOX        "修改日期", 2805, 10, 142, 252, 46
+  CONTROL         "", 2810, "SysDateTimePick32", 0x50010004, 16, 156, 120, 16
+  CONTROL         "", 2811, "SysDateTimePick32", 0x50010009, 160, 156, 96, 16
+  DEFPUSHBUTTON   "确定", 1, 180, 8, 60, 18
+  PUSHBUTTON      "取消", 2, 180, 30, 60, 18
+END
+
+// ---------------------------- 关于 / 开源协议 ----------------------------
+// 和 设置、更改文件日期 一样：模板坐标只是占位，AboutProc / LicenseProc 在
+// WM_INITDIALOG 里按 DPI 重新量放。文本内容由代码设置（许可证全文太长，不适合
+// 写在资源模板里）。
+IDD_ABOUT DIALOGEX 0, 0, 260, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于"
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  ICON            IDI_IC_APP, IDC_ABOUT_ICON, 12, 10, 20, 20
+  LTEXT           "Arade文件更名器", IDC_ABOUT_TITLE, 40, 10, 200, 10
+  LTEXT           "", IDC_ABOUT_TEXT, 12, 34, 236, 90
+  PUSHBUTTON      "赞助/联系(&S)", IDC_ABOUT_SPONSOR, 58, 126, 64, 16
+  PUSHBUTTON      "开源协议(&L)", IDC_ABOUT_LICENSE, 128, 126, 60, 16
+  DEFPUSHBUTTON   "确定", 1, 192, 126, 56, 16
+END
+
+// 收款码 + 联系方式 + 误报免责声明。坐标只是占位，SponsorProc 按 DPI 重新量放；
+// 三个二维码和三行链接是普通 Static，但装了子类化过程自绘/响应点击（见 main.cpp SponsorSubProc）；
+// 文字都写在本模板里，所以语言包能照常覆盖。
+IDD_SPONSOR DIALOGEX 0, 0, 230, 200
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_CLIPCHILDREN
+CAPTION "赞助与支持"
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  CONTROL "微信",      IDC_SP_QR_WX,  "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 8, 8, 52, 68
+  CONTROL "支付宝",    IDC_SP_QR_ALI, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 68, 8, 52, 68
+  CONTROL "PayPal",    IDC_SP_QR_PP,  "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 128, 8, 52, 68
+  CONTROL "开源地址: https://github.com/yjhua2005/AradeRenamer/", IDC_SP_GITHUB, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 8, 84, 200, 8
+  CONTROL "QQ 群: 484508921", IDC_SP_QQ, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 8, 96, 130, 8
+  PUSHBUTTON "复制群号", IDC_SP_COPY_QQ, 160, 94, 48, 12
+  CONTROL "开发者: yjhua2005    个人 QQ: 10683223", IDC_SP_AUTHOR, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT, 8, 108, 200, 8
+  CONTROL "邮箱: 10683223@qq.com", IDC_SP_EMAIL, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, 8, 120, 200, 8
+  CONTROL "开源协议: MIT (见仓库根目录 LICENSE 文件)", IDC_SP_LIC, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT, 8, 132, 200, 8
+  GROUPBOX "", IDC_SP_DISCLAIMER, 8, 144, 214, 34
+  CONTROL "本软件纯 Win32 API 开发，无任何联网/后门行为。若遇到杀毒软件误报，请将本程序加入信任区，或自行从源码编译。", IDC_SP_DISC_TEXT, "Static", WS_CHILD | WS_VISIBLE | SS_LEFT, 14, 152, 202, 22
+  DEFPUSHBUTTON "确定", 1, 182, 182, 40, 14
+END
+
+IDD_LICENSE DIALOGEX 0, 0, 340, 240
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "开源协议"
+FONT 9, "Microsoft YaHei", 0, 0, 1
+BEGIN
+  ; CONTROL 的样式是原样使用的，WS_CHILD/WS_VISIBLE 要自己写全（和 2735、2806 一样）。
+  CONTROL         "", IDC_LIC_TEXT, "Edit", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_TABSTOP, 8, 8, 324, 200
+  DEFPUSHBUTTON   "确定", 1, 276, 216, 56, 16
+END
+
+// ----------------------------- Icons -----------------------------
+// IDI_IC_APP has the lowest numeric ID, so it becomes the default EXE icon.
+IDI_IC_APP    ICON "resources\ICON\ic_app.ico"
+IDI_IC_ADD    ICON "resources\ICON\ic_add.ico"
+IDI_IC_ADDF   ICON "resources\ICON\ic_folder.ico"
+IDI_IC_DEL    ICON "resources\ICON\ic_del.ico"
+IDI_IC_CLEAR  ICON "resources\ICON\ic_clear.ico"
+IDI_IC_PREVIEW ICON "resources\ICON\ic_preview.ico"
+IDI_IC_APPLY  ICON "resources\ICON\ic_apply.ico"
+IDI_IC_UNDO   ICON "resources\ICON\ic_undo.ico"
+IDI_IC_PIN    ICON "resources\ICON\ic_pin.ico"
+IDI_IC_TAGDEL ICON "resources\ICON\ic_tagdel.ico"
+IDI_IC_TAGEXT ICON "resources\ICON\ic_tagext.ico"
+IDI_IC_TAGWRITE ICON "resources\ICON\ic_tagwrite.ico"
+IDI_IC_T2S    ICON "resources\ICON\ic_t2s.ico"
+IDI_IC_TEXTCMD ICON "resources\ICON\ic_textcmd.ico"
+IDI_IC_EXPLIST ICON "resources\ICON\ic_explist.ico"
+IDI_IC_RECOPEN ICON "resources\ICON\ic_recopen.ico"
+IDI_IC_RECSAVE ICON "resources\ICON\ic_recsave.ico"
+IDI_IC_RECCLEAR ICON "resources\ICON\ic_recclear.ico"
+IDI_IC_CHGDATE ICON "resources\ICON\ic_chgdate.ico"
+IDI_IC_RECPANEL ICON "resources\ICON\ic_recpanel.ico"
+IDI_IC_SPONSOR  ICON "resources\ICON\ic_sponsor.ico"
+
+// --------------------------- 开源许可证全文 ---------------------------
+// 上游 LICENSE 原文，未作修改，编译时打进 exe；"关于 -- 开源协议" 直接读 RCDATA。
+IDR_LIC_OPENCC   RCDATA "data\license_opencc.txt"
+IDR_LIC_PINYIN   RCDATA "data\license_pinyin_data.txt"
+
+// ----------------------------- 赞助收款码 -----------------------------
+// 由 tools\prep_sponsor.cmd 从 REF\ 生成（已 -strip 去元数据、限 720px、统一压缩），
+// 打进 exe 后磁盘上不留散落的图片文件。换图 = 覆盖 REF\ 源图 -> 跑脚本 -> 重新编译。
+IDR_SPONSOR_WECHAT RCDATA "resources/sponsor_wechat.jpg"
+IDR_SPONSOR_ALIPAY RCDATA "resources/sponsor_alipay.jpg"
+IDR_SPONSOR_PAYPAL RCDATA "resources/sponsor_paypal.jpg"
+
+// ----------------------------- 数据字典 ------------------------------
+// 全部是上游原文件，一个字节都没改：升级字典只要覆盖这几个文件重新编译，
+// 不需要同步脚本、也不需要在用户机器上带数据文件。
+//   TSCharacters.txt 键=繁体 值=简体 (OpenCC 的 t2s 用)
+//   STCharacters.txt 键=简体 值=繁体 (OpenCC 的 s2t 用)
+//   TSPhrases.txt / STPhrases.txt 是对应的词组表 (最长匹配, 优先于单字)
+// 注意: Add-ons\gbkfix.txt 故意不在这里 —— 它是运行时从磁盘读的用户自定义
+// 修正表，改了不用重新编译。
+IDR_DICT_T2S     RCDATA "data\\dictionary\\TSCharacters.txt"
+IDR_DICT_S2T     RCDATA "data\\dictionary\\STCharacters.txt"
+IDR_PINYIN       RCDATA "data\pinyin.txt"
+IDR_DICT_T2S_PHRASES RCDATA "data\\dictionary\\TSPhrases.txt"
+IDR_DICT_S2T_PHRASES RCDATA "data\\dictionary\\STPhrases.txt"
+// 内置语言包: 没有 Language\ 目录时靠这两个也能用中文/英文; 磁盘上的同名语言
+// (按 lang.code 匹配) 会覆盖内嵌副本, 所以加语言不必重新编译。
+IDR_LANG_ZH_CN       RCDATA "Language\\lang_zh-CN.ini"
+IDR_LANG_EN_US       RCDATA "Language\\lang_en-US.ini"
+
+// ----------------------------- 版本信息 ------------------------------
+// exe 属性里的「版本」标签页全靠这一段；没有它属性会显示 0.0.0.0，
+// 也拿不到产品名和版权（v1.0 发布必须有）。沿用本文件自包含的风格，
+// 不 #include <winver.h>，常量自己定义。
+#define VOS_NT_WINDOWS32   0x00040004L
+#define VFT_APP            0x00000001L
+#define VFT2_UNKNOWN       0x00000000L
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+FILEFLAGSMASK   0x3fL
+FILEFLAGS       0x0L
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName",      "yjhua2005"
+            VALUE "FileDescription",  "AradeRenamer - Batch file renamer"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AradeRenamer"
+            VALUE "LegalCopyright",   "Copyright (c) 2026 yjhua2005"
+            VALUE "OriginalFilename", "AradeRenamer.exe"
+            VALUE "ProductName",      "AradeRenamer"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

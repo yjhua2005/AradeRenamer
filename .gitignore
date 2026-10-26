@@ -1,0 +1,31 @@
+# ===== AradeRenamer 忽略规则 =====
+
+# 编译中间产物（可重新生成，不入库）
+build/
+obj/
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Python 缓存
+__pycache__/
+
+# 当前构建产物（二进制，不入库；带版本号的发布快照放 dist/ 可酌情保留）
+bin/
+dist/
+
+# 编辑器 / 操作系统
+.DS_Store
+Thumbs.db
+*.swp
+
+# 本地 / 个人目录（不入库）
+BACKUP/
+thirdtools/
+screenshots/
+REF/
+agentdebug/
+.workbuddy/
+

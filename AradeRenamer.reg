@@ -1,0 +1,39 @@
+Windows Registry Editor Version 5.00
+; 把 AradeRenamer.exe 集成到资源管理器右键菜单（文件 / 文件夹 / 文件夹背景）
+; 写 HKEY_CLASSES_ROOT，对机器上所有用户生效 —— 与程序内
+; 选项 > 添加右键菜单(管理员) 写的是同一批键、同一个位置。
+;
+; —— 管理员权限 ——
+; HKEY_CLASSES_ROOT 的写入会落到 HKLM\Software\Classes，**需要管理员权限**：
+;   1) 用管理员身份打开 PowerShell / 终端，执行  reg import AradeRenamer.reg
+;   2) 或管理员身份打开注册表编辑器，文件 > 导入
+;   3) 或右键本文件选"合并"（当前必须具有管理员令牌，否则会报"无法导入"）
+; 不想手工导的话，直接运行程序点 选项 > 添加右键菜单(管理员) 更省事：它会自动
+; 填好 exe 路径、并在需要时自己申请一次管理员权限（弹一次 UAC）。
+;
+; !! 导入前必须先把下面 6 处 REPLACE_WITH_FULL_PATH_TO_EXE 换成 AradeRenamer.exe 的
+; !! 实际完整路径（反斜杠要写成两个，例如 C:\\Tools\\AradeRenamer.exe）。
+
+; ===== 右键文件 =====
+[HKEY_CLASSES_ROOT\*\shell\AradeRenamer]
+@="AradeRenamer 更名"
+"Icon"="REPLACE_WITH_FULL_PATH_TO_EXE,0"
+
+[HKEY_CLASSES_ROOT\*\shell\AradeRenamer\command]
+@="\"REPLACE_WITH_FULL_PATH_TO_EXE\" \"%1\""
+
+; ===== 右键文件夹（Folder 比 Directory 覆盖面广：文件夹 / 驱动器 / 库都算）=====
+[HKEY_CLASSES_ROOT\Folder\shell\AradeRenamer]
+@="AradeRenamer 更名"
+"Icon"="REPLACE_WITH_FULL_PATH_TO_EXE,0"
+
+[HKEY_CLASSES_ROOT\Folder\shell\AradeRenamer\command]
+@="\"REPLACE_WITH_FULL_PATH_TO_EXE\" \"%V\""
+
+; ===== 文件夹背景（文件夹内空白处右键）=====
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AradeRenamer]
+@="AradeRenamer 更名"
+"Icon"="REPLACE_WITH_FULL_PATH_TO_EXE,0"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AradeRenamer\command]
+@="\"REPLACE_WITH_FULL_PATH_TO_EXE\" \"%V\""

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AradeRenamer 用户手册</title>
+<p style="color:#888; font-size:0.9em; background:#f9f9f9; padding:8px; border-radius:4px;">
+  [EN] This manual is written in Chinese. If you are using an English browser, please right-click on this page and select "Translate to English".
+</p>
+<style>
+  body { font-family: "Microsoft YaHei", "微软雅黑", sans-serif; margin: 32px auto; max-width: 860px;
+         color: #222; line-height: 1.7; padding: 0 16px; }
+  h1 { border-bottom: 3px solid #2b6cb0; padding-bottom: 8px; }
+  h2 { border-left: 5px solid #2b6cb0; padding-left: 10px; margin-top: 36px; }
+  h3 { color: #2b6cb0; margin-bottom: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #bbb; padding: 6px 10px; text-align: left; vertical-align: top;
+           overflow-wrap: break-word; }
+  th { background: #eef4fb; }
+  /* 按键这一列不许折行: "Ctrl+Alt+J" 断成两截比挤一点更难认 */
+  td.kb, th.kb { white-space: nowrap; width: 1%; }
+  code, .k { background: #f3f3f3; border: 1px solid #ddd; border-radius: 3px;
+             padding: 1px 5px; font-family: Consolas, monospace; font-size: 0.95em; }
+  pre { background: #f6f8fa; border: 1px solid #ddd; border-radius: 6px; padding: 10px 14px;
+        overflow-x: auto; font-family: Consolas, monospace; }
+  .tip { background: #fff8e1; border-left: 4px solid #f0b429; padding: 8px 14px; margin: 12px 0; }
+  .tip ul { margin: 6px 0 2px 18px; padding: 0; }
+  .tip li { margin: 3px 0; }
+  .warn { background: #fdecea; border-left: 4px solid #e53e3e; padding: 8px 14px; margin: 12px 0; }
+  .menu { color: #666; font-size: 0.92em; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+</style>
+</head>
+<body>
+
+<h1>AradeRenamer 用户手册</h1>
+<p>Arade文件更名器（Win32 桌面程序，纯 Win32 API 实现，无第三方运行库依赖）。本手册覆盖全部菜单命令、
+标签页用法、音频标签读写、编码转换与常见问题。</p>
+
+<h2>1. 快速上手</h2>
+<ol>
+  <li><b>添加文件</b>：工具栏「添加文件 / 添加目录」，或把文件/文件夹直接拖进列表，或在资源管理器里右键
+      「AradeRenamer 更名」。</li>
+  <li><b>设置规则</b>：在下方标签页（整体 / 替换 / 序号 / 添加 / 删除 / 扩展更名 / 标签命名 / 标签写入）
+      里勾选并填写，各页规则<b>叠加</b>生效（顺序：整体 → 替换 → 删除 → 添加 → 序号 → 扩展更名 → 整体扩展名 → CRC32）。</li>
+  <li><b>预览</b>：列表「预览」列实时显示新名字；状态栏显示 文件数 / 待更名数 / 冲突数。冲突行标红。</li>
+  <li><b>应用</b>：点「更名」(Ctrl+E)。目标已存在时自动加 <code>(2)</code> 后缀；「撤销」(Ctrl+Z) 回退上一批。</li>
+</ol>
+<p class="menu">打勾列（第一列）取消打勾的行不参与预览和更名；右键列表行可批量打勾/取消/删除。</p>
+
+<h3>多选文件与单实例</h3>
+<p>在资源管理器里选中多个文件、右键「AradeRenamer 更名」时，系统会为每个文件各调用一次本程序。
+本程序是<b>单实例</b>的：</p>
+<ul>
+  <li>第一个调用建立窗口并载入它的文件；</li>
+  <li>其余调用不另开窗口，而是把自己的文件<b>合并进已有窗口的列表</b>（重复文件自动去重），并把窗口带到前台；</li>
+  <li>直接双击/带参数启动 exe、把文件拖到 exe 图标上，同样遵循这个规则——永远只有一个窗口。</li>
+</ul>
+<p>所以选中 N 个文件右键，结果是<b>一个窗口里列出全部 N 个文件</b>，而不是开 N 个窗口。</p>
+
+<h2>2. 标签页详解</h2>
+
+<h3>2.1 整体</h3>
+<table>
+<tr><th>选项</th><th>说明</th></tr>
+<tr><td>文件名大小写</td><td>大写 / 小写 / 每个单词首字母大写</td></tr>
+<tr><td>文件名改成</td><td>整名替换，支持元变量 <code>&lt;DATE&gt; &lt;TIME&gt; &lt;NAME&gt; &lt;EXT&gt; &lt;.EXT&gt; &lt;PARENT&gt; &lt;SELF&gt; &lt;R&gt; &lt;N&gt;</code></td></tr>
+<tr><td>扩展名大小写 / 扩展名改成</td><td>对扩展名单独处理</td></tr>
+<tr><td>文件过滤</td><td>如 <code>*.mp3</code>，限定只作用于匹配的文件</td></tr>
+</table>
+
+<h3>2.2 替换</h3>
+<p>普通文本查找替换；勾选「正则表达式」后按正则替换（<code>$1</code> 反向引用），查找框以 <code>:</code>
+开头也会自动启用正则。可忽略大小写。</p>
+
+<h3>2.3 序号</h3>
+<p>模板中 <code>#</code> = 序号，<code>&lt;NAME&gt;</code> = 原名，<code>&lt;SELF&gt;</code> = 当前名。
+支持起始值 / 步长 / 位数补零 / 字母编号（0→A，勾「字母大写」出 A，否则 a）。
+模板不含扩展名时自动保留原扩展名。</p>
+
+<h3>2.4 添加 / 2.5 删除 / 2.6 扩展更名</h3>
+<p>添加：插入到文件名前/后、扩展名前/后或指定位置。删除：按指定文本、前 N 个、后 N 个、从第 N 个起删 M 个，
+作用范围可选文件名或扩展名。扩展更名：添加 / 删除 / 更改 / 大小写，另有「扩展命令」可叠加多个命令词。</p>
+<div class="tip">「扩展命令」预设里的<b>功能词固定是中文</b>（<code>汉字转换为拼音</code>、
+<code>字符顺序颠倒</code>……），界面切成英文也是这样——引擎就是按这些中文词匹配的，
+照着点预设或直接照抄进去即可，不要自己翻译成英文。</div>
+
+<h3>2.7 标签命名</h3>
+<p>用音乐文件的标签给文件命名。表达式里 <code>%1</code>艺术家 <code>%2</code>标题 <code>%3</code>音轨
+<code>%4</code>专辑 <code>%5</code>年代 <code>%6</code>注释，如 <code>%3.%1 - %2</code>。
+文件没有标签时保持原名（不会把名字抹空）。标签值里的 <code>\ / : * ? " &lt; &gt; |</code> 会替换成空格，
+避免改名失败或跑进子目录。</p>
+
+<h3>2.8 标签写入</h3>
+<p>把标签写进音乐文件：填写 艺术家/标题/专辑/音轨/年代/流派/注释，或用「文件名表达式」从文件名反解
+（如 <code>%1 - %2</code> 匹配「歌手 - 歌名」）。「保存」写打勾/选中的行，「全写」写整个列表。
+行为受 设置 &gt; 音乐文件标签 控制（见 §5.2）。</p>
+
+<h2>3. 更名菜单（更名 P）</h2>
+<table>
+<tr><th>命令</th><th>快捷键</th><th>说明</th></tr>
+<tr><td>预览</td><td class="kb">Ctrl+F</td><td>只按当前规则算出新名填进「预览」列，不动磁盘上的文件</td></tr>
+<tr><td>应用（更名）</td><td class="kb">Ctrl+E</td><td>真正改名；目标已存在时自动加 <code>(2)</code> 后缀</td></tr>
+<tr><td>撤销</td><td class="kb">Ctrl+Z</td><td>回退上一批更名；更早的批次用「打开操作记录」载回</td></tr>
+<tr><td>打开 / 保存操作记录</td><td class="kb">Ctrl+O / Ctrl+S</td><td>操作记录是撤销用的日志，可存成文件下次载入</td></tr>
+<tr><td>清除操作记录</td><td class="kb">Ctrl+Shift+R</td><td>清空撤销日志（文件本身不受影响）</td></tr>
+<tr><td>调用文本文件命令</td><td class="kb">Ctrl+Shift+T</td><td>见 §4.3</td></tr>
+<tr><td>提取音乐文件标签命名</td><td class="kb">Ctrl+D</td><td>跳到 标签命名 页并回填表达式</td></tr>
+<tr><td>文件名繁体转简体 / 简体转繁体</td><td class="kb">Ctrl+Alt+S / Ctrl+Alt+T</td><td>整名转换，再点一次同命令取消</td></tr>
+<tr><td>文件名 BIG5 -&gt; GB / GB -&gt; BIG5</td><td class="kb">Ctrl+G / Ctrl+Alt+B</td><td>见 §4.1</td></tr>
+<tr><td>文件名日文Shift-JIS转中文 / 中文转日文Shift-JIS</td><td class="kb">Ctrl+Alt+G / Ctrl+Alt+J</td><td>见 §4.1</td></tr>
+<tr><td>以文件的 CRC32 更名</td><td class="kb">Ctrl+Alt+C</td><td>用文件内容的 CRC32（8 位十六进制）作主名，保留扩展名</td></tr>
+<tr><td>以网页文件的标题更名</td><td class="kb">Ctrl+T</td><td>见 §4.2，<b>只对 .htm/.html 生效</b></td></tr>
+<tr><td>以文本文件的第一行内容更名</td><td class="kb">Ctrl+L</td><td>见 §4.2，只对 .txt 生效</td></tr>
+</table>
+
+<h2>4. 特殊的名字来源与编码转换</h2>
+
+<h3>4.1 文件名 / 标签的内码转换（BIG5↔GB、Shift-JIS↔中文）</h3>
+<p>这类命令修的是「按错误代码页误读」的名字：繁体系统里按 Big5 存放的文件名，被 GBK 系统按 GBK 解释后
+显示为乱码（或反之）。命令把每个字符<b>取回原代码页的字节、再按目标代码页解释</b>，乱码即恢复为正常文字。</p>
+<ul>
+  <li><b>文件名 BIG5 -&gt; GB</b>：文件名是 Big5 字节但被按 GBK 误读 → 修正。</li>
+  <li><b>文件名 GB -&gt; BIG5</b>：反向修正。</li>
+  <li><b>文件名日文Shift-JIS转中文</b>：文件名是 Shift-JIS 字节但被按 GBK 误读 → 恢复为可正常显示的日文文本。</li>
+  <li><b>文件名中文转日文Shift-JIS</b>：把中文名编成 Shift-JIS 字节再按 GBK 误读（在日文系统上显示为中文的场景）。</li>
+  <li>标签菜单下同名命令（标签 BIG5-&gt;GB 等）对的是文件里的标签值，读出来 → 转换 → 写回。</li>
+</ul>
+<div class="tip">只对确定是「误读」的名字使用。正常的中文名字执行这些命令也可能被改变（它眼里每个字符都可能是误读）。</div>
+
+<h3>4.2 以网页标题 / 文本第一行更名</h3>
+<ul>
+  <li><b>以网页文件的标题更名</b>：读取 <code>&lt;title&gt;…&lt;/title&gt;</code> 作为新主名。
+      自动识别页面编码（UTF-8 / GBK / Big5 / Shift-JIS，看 BOM 和 meta charset），并解开 HTML 实体
+      （<code>&amp;amp;</code> 等）。<b>只作用于 .htm / .html 文件</b>；列表里没有网页文件时命令不生效。</li>
+  <li><b>以文本文件的第一行内容更名</b>：取文本文件第一行（自动跳过 BOM、支持 UTF-8/GBK）作新主名。
+      <b>只作用于 .txt 文件</b>。</li>
+</ul>
+<p>两个命令都是开关式：再点一次同一命令即取消，恢复原名。</p>
+
+<h3>4.3 调用文本文件命令</h3>
+<p>选择一个命令文本文件，每行一条更名指令，程序按指令直接给出新名（见「预览」列）。</p>
+<pre># 注释行
+旧歌.mp3=新歌.mp3
+照片.jpg=旅行            # 新名不带扩展名则保留原扩展名
+a.txt	b.txt            # 也可以用 Tab 分隔</pre>
+<ul>
+  <li>按<b>原文件名</b>（含扩展名）匹配，大小写不敏感；匹配不到的行保持原名。</li>
+  <li>新名里的 <code>\ / : * ? " &lt; &gt; |</code> 会被替换成空格。</li>
+  <li>匹配到的行仍受其它标签页规则叠加影响（如再勾了「添加」页会继续追加）。</li>
+</ul>
+
+<h2>5. 标签菜单（标签 T）与设置</h2>
+
+<h3>5.1 标签命令</h3>
+<table>
+<tr><th>命令</th><th>快捷键</th><th>说明</th></tr>
+<tr><td>移除音乐文件标签</td><td class="kb">Ctrl+R</td><td>MP3 剥掉头部 ID3v2 / 尾部 ID3v1（按设置里的模式）；FLAC 丢掉 VORBIS_COMMENT 块；
+OGG/Opus 把注释包换成空包（容器规范要求注释头存在，不能整包删）；APE 剥掉尾部 APE 标签；M4A 清空 ilst；WAV 删掉 LIST-INFO 块</td></tr>
+<tr><td>写入音乐文件标签</td><td class="kb">Ctrl+W</td><td>跳到 标签写入 页</td></tr>
+<tr><td>导出音乐文件标签</td><td class="kb">Ctrl+Shift+E</td><td>把打勾/选中行的标签存成文本文件，格式见 §5.3</td></tr>
+<tr><td>利用文本文件写入标签</td><td class="kb">Ctrl+Shift+I</td><td>按文本文件内容写回标签，格式见 §5.3</td></tr>
+<tr><td>MP3 文件的 ID3v1 复制到 ID3v2 / ID3v2 复制到 ID3v1</td><td class="kb">—</td><td>两个块互转，另一块保持原样</td></tr>
+<tr><td>音乐文件标签 BIG5-&gt;GB 等 6 条</td><td class="kb">—</td><td>对标签值做 §4.1 的编码转换（含繁简互转）</td></tr>
+</table>
+
+<h3>5.2 设置 &gt; 音乐文件标签</h3>
+<table>
+<tr><th>选项</th><th>说明</th></tr>
+<tr><td>MP3 ID3v2 标签优先</td><td>默认 ID3v1 优先（两个块都有时先读 v1，v2 只补空字段）</td></tr>
+<tr><td>移除ID3标签时</td><td>只移除ID3v1 / 只移除ID3v2 / 同时移除</td></tr>
+<tr><td>ID3标签写入时</td><td>只写入ID3v1 / 只写入ID3v2 / 同时写入</td></tr>
+<tr><td>标签写入时提示</td><td>执行前弹确认框</td></tr>
+<tr><td>保留文件日期</td><td>写入后还原文件的创建/访问/修改时间</td></tr>
+<tr><td>音轨数字低于两位自动补0</td><td>"3" 显示为 "03"</td></tr>
+<tr><td>保留空白项的标签</td><td>页面上留空的项沿用文件里原来的值</td></tr>
+<tr><td>写入前先备份原文件 (.bak)</td><td>每个文件先复制一份 .bak</td></tr>
+</table>
+
+<h3>5.3 标签文本文件格式（导出 / 利用文本文件写入）</h3>
+<p>每行一条记录，<b>Tab 分隔</b>，共 8 列：</p>
+<pre>文件名    艺术家    标题    专辑    音轨    年代    流派    注释
+01 - 晴天.mp3    周杰伦    叶惠美    叶惠美    3    2003    流行    最爱</pre>
+<ul>
+  <li>字段可留空（留空 = 不动该项 / 导出时为空）。</li>
+  <li><code>#</code> 或 <code>;</code> 开头的行是注释；首行表头会自动跳过。</li>
+  <li>写入时按<b>文件名</b>（含扩展名）匹配，大小写不敏感；匹配不到的行跳过。</li>
+  <li>文件可以是 UTF-8（带/不带 BOM）、UTF-16 或 GBK 编码，程序自动识别。</li>
+</ul>
+
+<h2>6. 支持的音频格式</h2>
+<table>
+<tr><th>格式</th><th>容器</th><th>读</th><th>写</th></tr>
+<tr><td>MP3</td><td>ID3v1 / ID3v2.2-2.4</td><td>✔</td><td>✔</td></tr>
+<tr><td>FLAC</td><td>VORBIS_COMMENT 块</td><td>✔</td><td>✔</td></tr>
+<tr><td>OGG (Vorbis)</td><td>Vorbis comment（重算分页 CRC）</td><td>✔</td><td>✔</td></tr>
+<tr><td>Opus</td><td>OpusTags</td><td>✔</td><td>✔</td></tr>
+<tr><td>APE (Monkey's Audio)</td><td>APEv2</td><td>✔</td><td>✔</td></tr>
+<tr><td>M4A / AAC (MP4 容器)</td><td>ilst 元数据（含 stco 偏移修正）</td><td>✔</td><td>✔</td></tr>
+<tr><td>WAV</td><td>RIFF LIST-INFO</td><td>✔</td><td>✔</td></tr>
+<tr><td>WavPack (.wv)</td><td>APEv2</td><td>✔</td><td>✔</td></tr>
+</table>
+<div class="tip">写操作只动标签结构：不认识的 frame / metadata block / 音频数据原样保留，写入用
+「临时文件 + 原子替换」，失败不会留半成品。OGG/Opus 只处理单一路流（Vorbis/Opus），多路复用或链式文件不写。</div>
+
+<h2>7. 资源管理器右键菜单 与 发送到</h2>
+
+<h3>7.1 右键菜单（注册表方式）</h3>
+<p>菜单「选项 &gt; 添加右键菜单(管理员)」在三个位置注册「AradeRenamer 更名」：
+所有文件、文件夹、目录背景。它写在
+<code>HKEY_CLASSES_ROOT</code> 下（<code>*\shell\AradeRenamer</code>、
+<code>Folder\shell\AradeRenamer</code>、<code>Directory\Background\shell\AradeRenamer</code>），
+对机器上<b>所有用户</b>生效，因此<b>需要管理员权限</b>——菜单名字里那个「(管理员)」就是这个意思。
+「卸载右键菜单(管理员)」移除它们。</p>
+<p>多选文件时，系统会为每个文件各调用一次程序；本程序是单实例的，全部文件会合并进同一个窗口（见 §1）。</p>
+<div class="tip"><b>关于管理员权限</b>：
+<ul>
+<li><b>不用自己先去「以管理员身份运行」</b>：直接点菜单，程序发现自己没提权会弹一个询问框，
+点「确定」就以管理员身份重启一份自己来完成这件事，期间<b>系统会弹一次 UAC</b>让你确认。
+（重启起来的那份只干这一件事，干完就退出，不会多开一个主窗口。）</li>
+<li>已经用管理员身份运行着 exe 时再点，就直接写了，不再弹 UAC。</li>
+<li>不想走提权的话，也可以退出程序后右键 <code>AradeRenamer.exe</code> 选
+「以管理员身份运行」，再执行同一个命令；或者手工导入随附的 <code>AradeRenamer.reg</code>
+（<b>注册表编辑器导入同样需要管理员权限</b>）。</li>
+<li>程序<b>平时不常驻管理员权限</b>，只有这一下才提权。</li>
+<li>万一写入还是被拒绝（公司机器禁改注册表、UAC 被取消），程序会明确提示
+「没有权限写入注册表（访问被拒绝）」，而不是只说「成功 0 条」。</li>
+<li>卸载时会顺带清掉<b>早期版本</b>写到别处的残留键（含用户级 <code>HKCU\Software\Classes</code>
+下的同名键——它在合并视图里优先级更高，会把新写的值盖住）。</li>
+</ul></div>
+
+<h3>7.2 发送到菜单（快捷方式方式，不是注册表）</h3>
+<p>菜单「选项 &gt; 添加到 发送到 菜单」会在
+<code>%APPDATA%\Microsoft\Windows\SendTo\</code> 放一个指向本程序的快捷方式
+（<b>不走注册表</b>——Windows 的发送到菜单就是扫描这个文件夹里的 .lnk）。
+「从 发送到 菜单移除」删掉它。</p>
+<p>用法：资源管理器选中文件 → 右键 → <b>发送到</b> → AradeRenamer 更名。</p>
+<div class="tip">发送到和右键菜单的一个区别：多选文件时，发送到会把<b>所有文件一次性</b>放在命令行里
+传给程序（一次调用带 N 个文件）；右键菜单则是一个文件调用一次。两种方式最终都是单实例、
+全部文件进同一个窗口的列表（重复文件自动去重）。</div>
+
+<h2>8. 其它功能</h2>
+<ul>
+  <li><b>操作记录</b>：自动记录每批更名；「保存操作记录」存为 .xto，「打开操作记录」载入并挂上撤销批次。</li>
+  <li><b>导出当前列表</b>：文件名列表存文本（可选带扩展名/带路径）。</li>
+  <li><b>更改文件日期</b>：批量改创建/访问/修改时间（当前时间或自定义）。</li>
+  <li><b>界面语言</b>：菜单「选项 &gt; 语言」切换。程序自带简体中文和 English，另有「自动」跟随
+Windows 界面语言。选择存在注册表里，下次启动沿用。切换后界面立即重排——标签页里的控件宽度是
+<b>按当前语言的文字实际长度算出来的</b>，不会因为英文比中文长就挤出截断。</li>
+  <li><b>赞助 / 联系</b>：工具栏<b>最右侧的 ❤️ 按钮</b>，或菜单「帮助 &gt; 关于 &gt; 赞助/联系」，
+打开的是同一个窗口：三个收款码，外加开源地址、QQ 群号和邮箱。
+后两条（QQ 群号、邮箱地址）<b>点一下就复制到剪贴板</b>，那一行会闪一下「已复制」；
+「开源地址」和「邮箱」两行是链接，点击时同样<b>先把地址复制进剪贴板</b>，再交给系统默认程序打开。
+万一打不开（比如机器上没装邮件客户端），地址已经在剪贴板里，直接粘贴即可。</li>
+  <li><b>窗口置顶 / 屏幕居中</b>：工具栏图钉按钮切换置顶；窗体每次启动都显示在屏幕中央，
+启动之后可随意拖动到任意位置，菜单「选项 &gt; 窗口居中显示」可随时把窗体挪回中央。</li>
+  <li><b>拖放</b>：把文件或文件夹拖进列表即添加。</li>
+</ul>
+
+<h3>8.1 添加一种新语言</h3>
+<p>语言包是 exe 旁边的 <code>Language\*.ini</code>，一个语言一个文件（UTF-8，键 = 值，支持
+<code>\n</code> <code>\t</code> <code>\\</code> 转义）。往该目录放一个新 .ini，重新启动后它就会出现在
+「选项 &gt; 语言」里，<b>不需要改代码、不需要重新编译</b>。两个内置语言包同时编译进了 exe，
+删掉 Language 目录程序照样是完整的中文/英文。</p>
+<p>每个语言包开头有三行元信息，<b>缺一不可</b>（<code>lang.name</code> / <code>lang.code</code>
+程序要读，<code>lang.author</code> 是给贡献者的署名位）：</p>
+<pre>; 以 ; 或 # 开头的整行是注释（行尾注释不生效——会被当成值的一部分）
+lang.name = 日本語
+lang.code = ja-JP
+lang.author = 你的署名</pre>
+<p><code>lang.author</code> 记的是<b>译者</b>而不是程序作者——别人补一门语言时改这一行就是他的署名。
+它会显示在「选项 &gt; 语言」菜单里，格式是 <code>English&nbsp; (yjhua2005)</code>：语言名后面跟一个括号，
+里面是译者。没写 <code>lang.author</code> 的语言包就只显示语言名，不会多出空括号。</p>
+<p>做法：复制 <code>Language\lang_en-US.ini</code>（<b>英语是翻译源语言</b>，从英文翻成你的语言最省事）改名成
+<code>lang_ja-JP.ini</code>，改上面三行，然后逐条翻译。<b>翻不动的键整行删掉即可</b>，运行期自动退回
+简体中文，所以一份只翻了一半的语言包也能用。</p>
+<div class="tip">英文包是手写的，偶尔会比刚新增的键落后几条。翻译前先跑一次
+<code>python tools/extract_lang.py</code>，它会列出这个包漏了哪些键；<code>lang_zh-CN.ini</code>
+由脚本生成、<b>键永远最全</b>，拿它当对照表查缺补漏即可。</div>
+<div class="tip">标签页里的控件宽度会跟着译文长度自动伸缩，所以一般不用担心译文太长把界面挤坏；
+只有整排实在放不下时才会压缩——那种情况下精简几条译文即可。</div>
+
+<h2>9. 快捷键一览</h2>
+
+<h3>9.1 文件列表（焦点在列表里时）</h3>
+<table>
+<tr><th>按键</th><th>作用</th></tr>
+<tr><td class="kb"><b>Delete</b></td><td>把<b>高亮选中的行</b>从列表里移除（就是右键菜单的「删除选择的列表项」）。
+<b>一行都没选中时按 Delete 不会有任何反应</b>，不会清空整个列表——清空请用右键菜单的
+「清空文件列表」。</td></tr>
+<tr><td class="kb">Ctrl+A</td><td>全部打勾（右键菜单的「全选」）。<b>注意是打勾，不是选中行</b>：
+打勾决定这一行参不参与本次更名。</td></tr>
+<tr><td class="kb">右键</td><td>弹出列表菜单：打勾 / 取消打勾 / 全选 / 全不选 / 删除选择的列表项 /
+清空文件列表 / 读入标签 / 播放</td></tr>
+</table>
+<div class="tip">焦点在<b>输入框</b>里时，Ctrl+A / Ctrl+Z 是编辑框自己的「全选文字」「撤销输入」，
+不会被上面的列表快捷键抢走；Delete 也是删字符，不会动列表。</div>
+
+<h3>9.2 文件 (F)</h3>
+<table>
+<tr><th>命令</th><th>快捷键</th></tr>
+<tr><td>添加文件</td><td class="kb">Ctrl+Shift+A</td></tr>
+<tr><td>导出当前列表</td><td class="kb">Ctrl+Shift+L</td></tr>
+<tr><td>退出</td><td class="kb">Alt+F4</td></tr>
+</table>
+
+<h3>9.3 更名 (P)</h3>
+<table>
+<tr><th>命令</th><th>快捷键</th></tr>
+<tr><td>预览</td><td class="kb">Ctrl+F</td></tr>
+<tr><td>应用（更名）</td><td class="kb">Ctrl+E</td></tr>
+<tr><td>撤销</td><td class="kb">Ctrl+Z</td></tr>
+<tr><td>打开操作记录</td><td class="kb">Ctrl+O</td></tr>
+<tr><td>保存操作记录</td><td class="kb">Ctrl+S</td></tr>
+<tr><td>清除操作记录</td><td class="kb">Ctrl+Shift+R</td></tr>
+<tr><td>调用文本文件命名</td><td class="kb">Ctrl+Shift+T</td></tr>
+<tr><td>提取音乐文件标签命名</td><td class="kb">Ctrl+D</td></tr>
+<tr><td>文件名繁体转简体</td><td class="kb">Ctrl+Alt+S</td></tr>
+<tr><td>文件名简体转繁体</td><td class="kb">Ctrl+Alt+T</td></tr>
+<tr><td>文件名 BIG5 -&gt; GB</td><td class="kb">Ctrl+G</td></tr>
+<tr><td>文件名 GB -&gt; BIG5</td><td class="kb">Ctrl+Alt+B</td></tr>
+<tr><td>文件名日文Shift-JIS转中文</td><td class="kb">Ctrl+Alt+G</td></tr>
+<tr><td>文件名中文转日文Shift-JIS</td><td class="kb">Ctrl+Alt+J</td></tr>
+<tr><td>以文件的 CRC32 更名</td><td class="kb">Ctrl+Alt+C</td></tr>
+<tr><td>以网页文件的标题更名</td><td class="kb">Ctrl+T</td></tr>
+<tr><td>以文本文件的第一行内容更名</td><td class="kb">Ctrl+L</td></tr>
+</table>
+
+<h3>9.4 标签 (T)</h3>
+<table>
+<tr><th>命令</th><th>快捷键</th></tr>
+<tr><td>移除音乐文件标签</td><td class="kb">Ctrl+R</td></tr>
+<tr><td>写入音乐文件标签</td><td class="kb">Ctrl+W</td></tr>
+<tr><td>导出音乐文件标签</td><td class="kb">Ctrl+Shift+E</td></tr>
+<tr><td>利用文本文件写入标签</td><td class="kb">Ctrl+Shift+I</td></tr>
+<tr><td>MP3 文件的 ID3v1 复制到 ID3v2</td><td class="kb">—</td></tr>
+<tr><td>MP3 文件的 ID3v2 复制到 ID3v1</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签 BIG5 -&gt; GB</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签 GB -&gt; BIG5</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签繁体转简体</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签简体转繁体</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签日文Shift-JIS转中文</td><td class="kb">—</td></tr>
+<tr><td>音乐文件标签中文转日文Shift-JIS</td><td class="kb">—</td></tr>
+</table>
+
+<h3>9.5 选项 (O) 与 帮助 (H)</h3>
+<table>
+<tr><th>命令</th><th>快捷键</th></tr>
+<tr><td>设置</td><td class="kb">Ctrl+Shift+O</td></tr>
+<tr><td>窗口居中显示</td><td class="kb">—</td></tr>
+<tr><td>语言（子菜单：选语言 / 打开语言文件夹）</td><td class="kb">—</td></tr>
+<tr><td>添加右键菜单(管理员)</td><td class="kb">Alt+O，A</td></tr>
+<tr><td>卸载右键菜单(管理员)</td><td class="kb">Alt+O，Z</td></tr>
+<tr><td>添加到 发送到 菜单</td><td class="kb">—</td></tr>
+<tr><td>从 发送到 菜单移除</td><td class="kb">—</td></tr>
+<tr><td>用户手册</td><td class="kb"><b>F1</b></td></tr>
+<tr><td>关于...</td><td class="kb">—</td></tr>
+</table>
+<p class="menu">标「—」的是<b>没有设快捷键</b>的命令：ID3 互转、6 条标签编码转换、发送到菜单的
+装 / 卸、窗口居中显示和「关于」，都不值得占掉一个常用组合键。
+菜单里带括号字母的（如「添加右键菜单(管理员)(A)」）是<b>菜单助记符</b>：先按
+<code>Alt+O</code> 展开「选项」菜单，再按那个字母即可，不需要鼠标。
+后加的几条统一用 <code>Ctrl+Shift+&lt;字母&gt;</code>：不带 Shift 的 <code>Ctrl+&lt;字母&gt;</code>
+基本排满了，而且 Ctrl+A / Ctrl+Z 在输入框里是编辑键，加 Shift 才不会打架。</p>
+<div class="tip">对话框里 <b>Enter</b> = 确定、<b>Esc</b> = 取消（「设置」等对话框都有这两个键）；
+主窗口 <b>Alt+F4</b> 或菜单「文件 &gt; 退出」退出。</div>
+
+<h2>10. 常见问题</h2>
+<p><b>Q：更名后想反悔？</b><br>
+A：点「撤销」(Ctrl+Z) 回退上一批；更早的批次用「打开操作记录」载回。</p>
+<p><b>Q：预览列和结果列什么意思？</b><br>
+A：「预览」是按当前规则算出的新名字；「结果」是上次执行这一行的结局（已更名/已写入标签/跳过/失败）。</p>
+<p><b>Q：标签写进去中文变问号？</b><br>
+A：ID3v1 只有 30 字节定长字段且按系统 ANSI 编码，中文按 GBK 存储；需要完整中文请用 ID3v2
+（设置 &gt; ID3标签写入时 选「只写入ID3v2」或「同时写入」）。</p>
+<p><b>Q：以网页标题更名没反应？</b><br>
+A：该命令只对 .htm/.html 生效，且页面里要有 <code>&lt;title&gt;</code>；列表里没有网页文件时命令不会开启。</p>
+<p><b>Q：编码转换命令把我的正常中文名也改了？</b><br>
+A：它按「每个字符都是被误读的字节」处理，只应用于确定是乱码的名字。</p>
+<p><b>Q：在列表里按 Delete 怎么没反应？</b><br>
+A：Delete 只删<b>高亮选中</b>的行。先点一下要删的行（按住 Ctrl / Shift 可多选）再按 Delete；
+一行都没选中时它故意什么都不做，免得误按一下整个列表就没了。要清空整个列表，
+用右键菜单里的「清空文件列表」。</p>
+
+<hr>
+<p style="color:#888">AradeRenamer — 经典批量改名器功能的 C++ 重写。本手册与程序同目录分发。</p>
+
+</body>
+</html>
